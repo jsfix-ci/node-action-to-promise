@@ -215,7 +215,7 @@ export interface IActionEntries {
     [action_type: string]: IActionEntry;
 }
 
-const actionToPromiseAction = (action: AnyAction, resolve: any, reject: any): IA2PAction => {
+export const actionToPromiseAction = (action: AnyAction, resolve: any, reject: any): IA2PAction => {
     return { type: action.type, payload: { ...action }, reject, resolve };
 }
 

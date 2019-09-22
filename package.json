@@ -1,37 +1,37 @@
 {
-  "name": "action-to-promise",
-  "version": "1.0.0",
-  "description": "Utility converting action to Promise in redux-saga environment.",
-  "main": "./.buils/index.js",
-  "types": "./.buils/index.d.ts",
-  "scripts": {
-    "prepublish": "tsc",
-    "test": "jest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ddziara/node-action-to-promise.git"
-  },
-  "keywords": [
-    "action",
-    "promise",
-    "redux-saga",
-    "saga",
-    "convert",
-    "transform"
-  ],
-  "author": "Dariusz Dziara",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ddziara/node-action-to-promise/issues"
-  },
-  "homepage": "https://github.com/ddziara/node-action-to-promise#readme",
-  "dependencies": {
-    "redux-saga": "^1.1.1"
-  },
-  "devDependencies": {
-    "jest": "^24.9.0",
-    "ts-jest": "^24.0.2",
-    "@types/jest": "^24.0.18"
-  }
+    "name": "action-to-promise",
+    "version": "1.0.0",
+    "description": "Utility converting action to Promise in redux-saga environment.",
+    "main": "./.build/index.js",
+    "types": "./.build/index.d.ts",
+    "scripts": {
+        "prepublish": "tsc",
+        "test": "jest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ddziara/node-action-to-promise.git"
+    },
+    "keywords": [
+        "action",
+        "promise",
+        "redux-saga",
+        "saga",
+        "convert",
+        "transform"
+    ],
+    "author": "Dariusz Dziara",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/ddziara/node-action-to-promise/issues"
+    },
+    "homepage": "https://github.com/ddziara/node-action-to-promise#readme",
+    "dependencies": {
+        "redux-saga": "^1.1.1"
+    },
+    "devDependencies": {
+        "jest": "^24.9.0",
+        "ts-jest": "^24.0.2",
+        "@types/jest": "^24.0.18"
+    }
 }
