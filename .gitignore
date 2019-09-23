@@ -1,0 +1,12 @@
+/node_modules
+/.build
+
+# testing
+/coverage
+
+# production
+/.build
+
+_vsc.bat
+
+.vscode/tasks.json
