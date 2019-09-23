@@ -1,6 +1,6 @@
 {
     "name": "action-to-promise",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "description": "Utility converting action to Promise in redux-saga environment.",
     "main": "./.build/index.js",
     "types": "./.build/index.d.ts",
@@ -35,5 +35,8 @@
         "jest": "^24.9.0",
         "ts-jest": "^24.0.2",
         "typescript": "^3.6.3"
+    },
+    "files": [
+        ".build"
+      ]
     }
-}
