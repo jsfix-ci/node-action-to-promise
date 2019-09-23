@@ -863,6 +863,241 @@ describe(`[action-to-promise] testing component`, () => {
         });    
     });
 
+//SSSSSSSSSSSSSS
+
+describe(`Fork for special action case when 2 actions dispatched`, () => {
+    let action2PromiseWrapper: any;
+    let testObject: ICreateTestObjectReturnType;
+    let prom1: Promise<void>;
+    let prom2: Promise<void>;
+
+    beforeAll(() => {
+        // setup
+        jest.resetModules();
+        const createSagaMiddleware = require('redux-saga').default;
+        action2PromiseWrapper = createAction2PromiseWrapper(createSagaMiddleware);
+        action2PromiseWrapper.registerActions({ start: "REQUEST", resolve: "LOADED", reject: "REQUEST_ERROR" });
+        testObject = createTestObject(action2PromiseWrapper);
+        const initialiseSagaMiddleware = action2PromiseWrapper.createSagaMiddleware({ sagaMonitor: testObject.getMonitor() });
+
+        const store = createStore(reducerRoot, storeEnhancers(applyMiddleware(initialiseSagaMiddleware)));
+
+        const sagaTask = initialiseSagaMiddleware.run(watcherSagaFork);
+
+        prom1 = dispatchStartAction(store, acDataRequest());             // special action
+        prom2 = dispatchStartAction(store, acDataRequest());             // special action
+        store.dispatch(END);                 // request end
+
+        return sagaTask.toPromise();
+    });
+
+    test(`testing interception of TAKE effect (special action case)`, async () => {
+        const result = testObject.getTestResults()[1];
+        const sagaTakeEffectsWatcher_props = Object.keys(result.sagaTakeEffectsWatcher);
+        expect(sagaTakeEffectsWatcher_props.length).toBe(1);
+        expect(parseInt(sagaTakeEffectsWatcher_props[0])).toBeGreaterThan(0);                                // name of the property (effectId) should be number > 0
+        expect(result.sagaTakeEffectsWatcher[sagaTakeEffectsWatcher_props[0]]).toBeGreaterThan(0);   // parrentEffectId should be number > 0
+    });
+
+    test(`testing resolving of TAKE effect (special action case)`, async () => {
+        const result = testObject.getTestResults()[2];
+
+        const expected_actionEntries = {
+            'REQUEST': {
+                type: ActionEntryType.Start,
+                refCount: 1,
+            },
+            'LOADED': {
+                type: ActionEntryType.Resolve,
+
+                startActionTypes: {
+                    ['REQUEST']: null,
+                }
+            },
+            'REQUEST_ERROR': {
+                type: ActionEntryType.Reject,
+
+                startActionTypes: {
+                    ['REQUEST']: null,
+                }
+            },
+        };
+
+        // check actionEntries
+        expect(result.actionEntries).toEqual(expected_actionEntries);
+
+        // check sagaEffectIds
+        const sagaEffectIds_props = Object.keys(result.sagaEffectIds);
+        expect(sagaEffectIds_props.length).toBe(1);
+        expect(parseInt(sagaEffectIds_props[0])).toBeGreaterThan(0);             // name of the property (effectId) should be number > 0
+
+        const expected_sagaEffectIds_property0 = {
+            kind: EffectIdKind.Parent,
+            parentEffectId: expect.any(Number),
+            resolve: expect.any(Function),
+            reject: expect.any(Function),
+            startActionType: 'REQUEST'
+        }
+
+        expect(result.sagaEffectIds[sagaEffectIds_props[0]]).toEqual(expected_sagaEffectIds_property0);
+
+        const sagaTakeEffectsWatcher_props = Object.keys(result.sagaTakeEffectsWatcher);
+        expect(sagaTakeEffectsWatcher_props.length).toBe(0);                                                  // should be zero because it should be deleted
+    });
+
+    test(`testing interception of FORK effect (special action case)`, async () => {
+        const result = testObject.getTestResults()[3];
+
+        const expected_actionEntries = {          // this shouldn't change
+            'REQUEST': {
+                type: ActionEntryType.Start,
+                refCount: 1,
+            },
+            'LOADED': {
+                type: ActionEntryType.Resolve,
+
+                startActionTypes: {
+                    ['REQUEST']: null,
+                }
+            },
+            'REQUEST_ERROR': {
+                type: ActionEntryType.Reject,
+
+                startActionTypes: {
+                    ['REQUEST']: null,
+                }
+            },
+        };
+
+        // check actionEntries
+        expect(result.actionEntries).toEqual(expected_actionEntries);
+
+        // check sagaEffectIds
+        const sagaEffectIds_props = Object.keys(result.sagaEffectIds);
+        expect(sagaEffectIds_props.length).toBe(1);
+        expect(parseInt(sagaEffectIds_props[0])).toBeGreaterThan(0);             // name of the property (effectId) should be number > 0
+
+        const expected_sagaEffectIds_property0 = {
+            kind: EffectIdKind.Task,
+            parentEffectId: expect.any(Number),
+            resolve: expect.any(Function),
+            reject: expect.any(Function),
+            startActionType: 'REQUEST'
+        }
+
+        expect(result.sagaEffectIds[sagaEffectIds_props[0]]).toEqual(expected_sagaEffectIds_property0);
+
+        // the following shouldn't change also
+        const sagaTakeEffectsWatcher_props = Object.keys(result.sagaTakeEffectsWatcher);
+        expect(sagaTakeEffectsWatcher_props.length).toBe(0);                                                  // should be zero because it should be deleted
+    });
+
+    test(`testing interception of PUT effect (special action case)`, async () => {
+        const result = testObject.getTestResults()[4];
+
+        const expected_actionEntries = {          // this shouldn't change
+            'REQUEST': {
+                type: ActionEntryType.Start,
+                refCount: 1,
+            },
+            'LOADED': {
+                type: ActionEntryType.Resolve,
+
+                startActionTypes: {
+                    ['REQUEST']: null,
+                }
+            },
+            'REQUEST_ERROR': {
+                type: ActionEntryType.Reject,
+
+                startActionTypes: {
+                    ['REQUEST']: null,
+                }
+            },
+        };
+
+        // check actionEntries
+        expect(result.actionEntries).toEqual(expected_actionEntries);
+
+        // check sagaEffectIds
+        const sagaEffectIds_props = Object.keys(result.sagaEffectIds);
+        expect(sagaEffectIds_props.length).toBe(2);
+        expect(parseInt(sagaEffectIds_props[0])).toBeGreaterThan(0);             // name of the property (effectId) should be number > 0
+        expect(parseInt(sagaEffectIds_props[1])).toBeGreaterThan(0);             // name of the property (effectId) should be number > 0
+
+        const expected_sagaEffectIds_property0 = {
+            kind: EffectIdKind.Task,
+            parentEffectId: expect.any(Number),
+            resolve: expect.any(Function),
+            reject: expect.any(Function),
+            startActionType: 'REQUEST'
+        }
+
+        const expected_sagaEffectIds_property1 = {
+            kind: EffectIdKind.Put,
+            parentEffectId: expect.any(Number),
+            resolve: expect.any(Function),
+            reject: expect.any(Function),
+            startActionType: 'REQUEST'
+        }
+
+        if (result.sagaEffectIds[sagaEffectIds_props[0]].kind === EffectIdKind.Task) {
+            expect(result.sagaEffectIds[sagaEffectIds_props[0]]).toEqual(expected_sagaEffectIds_property0);
+            expect(result.sagaEffectIds[sagaEffectIds_props[1]]).toEqual(expected_sagaEffectIds_property1);
+        }
+        else {
+            expect(result.sagaEffectIds[sagaEffectIds_props[0]]).toEqual(expected_sagaEffectIds_property1);
+            expect(result.sagaEffectIds[sagaEffectIds_props[1]]).toEqual(expected_sagaEffectIds_property0);
+        }
+
+        // note: do not test sagaTakeEffectsWatcher because we are on another thread
+    });
+
+    test(`testing resolving of PUT effect (special action case)`, async () => {
+        const result = testObject.getTestResults()[5];
+
+        const expected_actionEntries = {          
+            'REQUEST': {
+                type: ActionEntryType.Start,
+                refCount: 0,                    // decremented
+            },
+            'LOADED': {
+                type: ActionEntryType.Resolve,
+
+                startActionTypes: {
+                    ['REQUEST']: null,
+                }
+            },
+            'REQUEST_ERROR': {
+                type: ActionEntryType.Reject,
+
+                startActionTypes: {
+                    ['REQUEST']: null,
+                }
+            },
+        };
+
+        // check actionEntries
+        expect(result.actionEntries).toEqual(expected_actionEntries);
+
+        // check sagaEffectIds
+        const sagaEffectIds_props = Object.keys(result.sagaEffectIds);
+        expect(sagaEffectIds_props.length).toBe(0);                              // removed entries
+
+        // note: do not test sagaTakeEffectsWatcher because we are on another thread
+    });
+
+    test(`testing resolving of returned Promise1 (special action case)`, async () => {
+        return expect(prom1).resolves.toBeUndefined();    
+    });    
+
+    test(`testing resolving of returned Promise2 (special action case)`, async () => {
+        return expect(prom2).resolves.toBeUndefined();    
+    });    
+});
+
+//EEEEEEEEEEEEEE
+
     describe(`Fork for special action case with failure`, () => {
         let action2PromiseWrapper: any;
         let testObject: ICreateTestObjectReturnType;

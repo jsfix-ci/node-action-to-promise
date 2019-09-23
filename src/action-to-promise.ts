@@ -241,7 +241,7 @@ export interface ITestObject {
 }
 
 export interface IAction2PromiseWrapper {
-    createSagaMiddleware: (...args: any[]) => any; 
+    createSagaMiddleware: (options?: any) => any; 
     registerActions: (actions: IActionTriple) => void; 
     testObject: ITestObject;
 }    
@@ -251,8 +251,9 @@ export function createAction2PromiseWrapper(orgCreateSagaMiddleware: any): IActi
     const sagaTakeEffectsWatcher: ISagaTakeEffectWatcher = {};
     const sagaEffectIds: ISagaEffectIds = {};
 
-    const createSagaMiddleware = (options?: any) => {
+    const createSagaMiddleware = (options?: any): any => {
         const effectTriggeredHandler = ({ effectId, parentEffectId, label, effect }: { effectId: number; parentEffectId: number; label: string; effect: any }) => {
+            //console.log(`effectTriggeredHandler={{effectId=${effectId}, parentEffectId=${parentEffectId}, label=${parentEffectId}, effect=${JSON.stringify(effect)}}}`);
             const currEffect = <SimpleEffect<string, any>>effect;
 
             if (currEffect.type === take().type) {
@@ -272,6 +273,8 @@ export function createAction2PromiseWrapper(orgCreateSagaMiddleware: any): IActi
                             startActionType: parentSagaEffectId.startActionType
                         };
 
+                        //console.log(`FORK triggered; added to sagaEffectIds => sagaEffectIds[${effectId}]=${JSON.stringify(sagaEffectIds[effectId])}`);
+
                         // delete parent effectId entry
                         delete sagaEffectIds[parentEffectId];
                     }
@@ -290,12 +293,16 @@ export function createAction2PromiseWrapper(orgCreateSagaMiddleware: any): IActi
                             reject: parentSagaEffectId.reject,
                             startActionType: parentSagaEffectId.startActionType
                         };
+
+                        //console.log(`PUT triggered; added to sagaEffectIds => sagaEffectIds[${effectId}]=${JSON.stringify(sagaEffectIds[effectId])}`);
                     }
                 }
             }
         };
 
         const effectResolvedHandler = (effectId: number, result: any) => {
+            //console.log(`effectTriggeredHandler={{effectId=${effectId}, result=${JSON.stringify(result)}}}`);
+
             // check if there's an entry in sagaTakeEffectsWatcher
             if (typeof sagaTakeEffectsWatcher[effectId] !== 'undefined') {
                 // so it is TAKE effect resolved
@@ -320,6 +327,8 @@ export function createAction2PromiseWrapper(orgCreateSagaMiddleware: any): IActi
                             reject: action.reject,
                             startActionType: result.type
                         };
+
+                        //console.log(`effectResolvedHandler: TAKE effect resolved; added to sagaEffectIds => sagaEffectIds[${parentEffectId}]=${JSON.stringify(sagaEffectIds[parentEffectId])}`);
                     }
                 }
 
@@ -338,6 +347,8 @@ export function createAction2PromiseWrapper(orgCreateSagaMiddleware: any): IActi
                         if (typeof terminateActon.startActionTypes !== 'undefined') {
                             if (typeof terminateActon.startActionTypes[sagaEffectId.startActionType] !== 'undefined') { // check if terminateAction is associated with startAction
                                 if (terminateActon.type === ActionEntryType.Resolve) {
+                                    //console.log(`effectResolvedHandler: PUT effect resolved; resolve`);
+
                                     if (typeof actionEntry.refCount !== 'undefined') actionEntry.refCount--;
                                     const resolve = sagaEffectId.resolve;
                                     delete sagaEffectIds[sagaEffectId.parentEffectId];
@@ -345,6 +356,8 @@ export function createAction2PromiseWrapper(orgCreateSagaMiddleware: any): IActi
                                     resolve();
                                 }
                                 else if (terminateActon.type === ActionEntryType.Reject) {
+                                    //console.log(`effectResolvedHandler: PUT effect resolved; reject`);
+
                                     if (typeof actionEntry.refCount !== 'undefined') actionEntry.refCount--;
                                     const reject = sagaEffectId.reject;
                                     delete sagaEffectIds[sagaEffectId.parentEffectId];
