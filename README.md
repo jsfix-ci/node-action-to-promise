@@ -1,4 +1,4 @@
-# node-action-to-promise
+# action-to-promise
 Utility converting action to Promise in redux-saga environment
 
 # What it does
