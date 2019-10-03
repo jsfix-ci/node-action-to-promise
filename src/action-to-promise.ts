@@ -223,11 +223,31 @@ export const actionFromPromiseAction = (action: IA2PAction): AnyAction => {
     return action.payload;
 }
 
+/**
+ * Function dispatches passed action to given store .
+ * 
+ * @param store - redux store
+ * @param action - redux action object
+ */
 export const dispatchStartAction = (store: Store, action: AnyAction): Promise<void> =>
     new Promise(
         (resolve, reject) => {
             // this dispatches start action with transformed payload
             store.dispatch(actionToPromiseAction(action, resolve, reject));
+        }
+    );
+
+/**
+ * Function dispatches given action using passed dispatch function.
+ * 
+ * @param dispatch - bound to store dispatch function
+ * @param action - redux action object
+ */
+export const compDispatchStartAction = (dispatch: (action: AnyAction) => AnyAction, action: AnyAction): Promise<void> =>
+    new Promise(
+        (resolve, reject) => {
+            // this dispatches start action with transformed payload
+            dispatch(actionToPromiseAction(action, resolve, reject));
         }
     );
 

@@ -169,6 +169,16 @@ interface IA2PAction {
 }
 ```
 
+#### `dispatchStartAction = (store: Store, action: AnyAction) => Promise<void>`
+
+Function dispatches action to the store calling 'dispatch' method of the store. It returns promise that will be resolved or rejected
+depindng on action (either resolve or reject) PUT'ed to the store.
+
+#### `compDispatchStartAction = (dispatch: (action: AnyAction) => AnyAction, action: AnyAction) => Promise<void>`
+
+Function dispatches action to store calling 'dispatch' method bound to that store. It returns promise that will be resolved or rejected
+depindng on action (either resolve or reject) PUT'ed to the store.
+
 #### `actionFromPromiseAction(action: IA2PAction) => AnyAction`
 
 Function usually called in Saga generator function to restore original action without `resolve` and `reject` properties.
