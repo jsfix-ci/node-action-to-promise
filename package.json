@@ -1,6 +1,6 @@
 {
     "name": "action-to-promise",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "description": "Utility converting action to Promise in redux-saga environment.",
     "main": "./.build/index.js",
     "types": "./.build/index.d.ts",
@@ -27,17 +27,17 @@
     },
     "homepage": "https://github.com/ddziara/node-action-to-promise#readme",
     "dependencies": {
-        "redux": "^4.0.4",
-        "redux-saga": "^1.1.1",
-        "handlebars": ">=4.3.0"
+        "handlebars": ">=4.3.0",
+        "redux": "^4.0.5",
+        "redux-saga": "^1.1.3"
     },
     "devDependencies": {
-        "@types/jest": "^24.0.18",
+        "@types/jest": "^24.9.1",
         "jest": "^24.9.0",
-        "ts-jest": "^24.0.2",
-        "typescript": "^3.6.3"
+        "ts-jest": "^24.3.0",
+        "typescript": "^3.7.5"
     },
     "files": [
         ".build"
-      ]
-    }
+    ]
+}
