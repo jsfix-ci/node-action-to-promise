@@ -219,8 +219,14 @@ export const actionToPromiseAction = (action: AnyAction, resolve: any, reject: a
     return { type: action.type, payload: { ...action }, reject, resolve };
 }
 
-export const actionFromPromiseAction = (action: IA2PAction): AnyAction => {
-    return action.payload;
+export const actionFromPromiseAction = (action: AnyAction): AnyAction => {
+    if ((typeof action.resolve !== 'undefined') && (typeof action.reject !== 'undefined')) {
+        const action2: IA2PAction = action as IA2PAction;
+        return action2.payload;
+    }
+    else {
+        return action;
+    }
 }
 
 /**
@@ -228,6 +234,7 @@ export const actionFromPromiseAction = (action: IA2PAction): AnyAction => {
  * 
  * @param store - redux store
  * @param action - redux action object
+ * @deprecated since version 1.4.0; use IAction2PromiseWrapper.dispatchStartAction instead
  */
 export const dispatchStartAction = (store: Store, action: AnyAction): Promise<void> =>
     new Promise(
@@ -242,6 +249,7 @@ export const dispatchStartAction = (store: Store, action: AnyAction): Promise<vo
  * 
  * @param dispatch - bound to store dispatch function
  * @param action - redux action object
+ * @deprecated since version 1.4.0; use IAction2PromiseWrapper.compDispatchStartAction instead
  */
 export const compDispatchStartAction = (dispatch: (action: AnyAction) => AnyAction, action: AnyAction): Promise<void> =>
     new Promise(
@@ -261,10 +269,12 @@ export interface ITestObject {
 }
 
 export interface IAction2PromiseWrapper {
-    createSagaMiddleware: (options?: any) => any; 
-    registerActions: (actions: IActionTriple) => void; 
+    createSagaMiddleware: (options?: any) => any;
+    registerActions: (actions: IActionTriple) => void;
     testObject: ITestObject;
-}    
+    dispatchStartAction: (store: Store, action: AnyAction) => Promise<void>;
+    compDispatchStartAction: (dispatch: (action: AnyAction) => AnyAction, action: AnyAction) => Promise<void>
+}
 
 export function createAction2PromiseWrapper(orgCreateSagaMiddleware: any): IAction2PromiseWrapper {
     const actionEntries: IActionEntries = {};
@@ -486,6 +496,48 @@ export function createAction2PromiseWrapper(orgCreateSagaMiddleware: any): IActi
             throw new Error("Cannot register start action: it is already registered");
     }
 
+
+    /**
+     * Function dispatches passed action to given store .
+     * 
+     * @param store - redux store
+     * @param action - redux action object
+     */
+    const dispatchStartAction = (store: Store, action: AnyAction): Promise<void> => {
+        // check if start action is registered
+        if (typeof actionEntries[action.type] === 'undefined') {
+            throw new Error(`The start action type ${action.type} is not registered, call registerActions() first`);
+        }
+
+        return new Promise(
+            (resolve, reject) => {
+                // this dispatches start action with transformed payload
+                store.dispatch(actionToPromiseAction(action, resolve, reject));
+            }
+        );
+    };
+
+    /**
+     * Function dispatches given action using passed dispatch function.
+     * 
+     * @param dispatch - bound to store dispatch function
+     * @param action - redux action object
+     */
+    const compDispatchStartAction = (dispatch: (action: AnyAction) => AnyAction, action: AnyAction): Promise<void> => {
+        // check if start action is registered
+        if (typeof actionEntries[action.type] === 'undefined') {
+            throw new Error(`The start action type ${action.type} is not registered, call registerActions() first`);
+        }
+
+        return new Promise(
+            (resolve, reject) => {
+                // this dispatches start action with transformed payload
+                dispatch(actionToPromiseAction(action, resolve, reject));
+            }
+        );
+    };
+
+
     // for testing only
     const getActionEntries = () => actionEntries;
     const getSagaTakeEffectsWatcher = () => sagaTakeEffectsWatcher;
@@ -524,6 +576,6 @@ export function createAction2PromiseWrapper(orgCreateSagaMiddleware: any): IActi
         resetSagaEffectIds
     };
 
-    return { createSagaMiddleware, registerActions, testObject };
+    return { createSagaMiddleware, registerActions, testObject, dispatchStartAction, compDispatchStartAction };
 }
 

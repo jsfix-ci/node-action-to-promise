@@ -413,6 +413,32 @@ describe(`[action-to-promise] testing component`, () => {
         });
     });
 
+    describe(`Dispatching of nonexisting action`, () => {
+        test(`Using dispatchStartAction()`, () => {
+            // setup
+            jest.resetModules();
+            const createSagaMiddleware = require('redux-saga').default;
+            const action2PromiseWrapper = createAction2PromiseWrapper(createSagaMiddleware);
+            const testObject = createTestObject(action2PromiseWrapper);
+            const initialiseSagaMiddleware = action2PromiseWrapper.createSagaMiddleware({ sagaMonitor: testObject.getMonitor() });
+
+            const store = createStore(reducerRoot, storeEnhancers(applyMiddleware(initialiseSagaMiddleware)));
+            expect(() => action2PromiseWrapper.dispatchStartAction(store, acDataRequest())).toThrow();
+        });
+
+        test(`Using compDispatchStartAction()`, () => {
+            // setup
+            jest.resetModules();
+            const createSagaMiddleware = require('redux-saga').default;
+            const action2PromiseWrapper = createAction2PromiseWrapper(createSagaMiddleware);
+            const testObject = createTestObject(action2PromiseWrapper);
+            const initialiseSagaMiddleware = action2PromiseWrapper.createSagaMiddleware({ sagaMonitor: testObject.getMonitor() });
+
+            const store = createStore(reducerRoot, storeEnhancers(applyMiddleware(initialiseSagaMiddleware)));
+            expect(() => action2PromiseWrapper.compDispatchStartAction(store.dispatch, acDataRequest())).toThrow();
+        });
+    });
+
     describe(`Channel + Fork for special action case`, () => {
         let action2PromiseWrapper: any;
         let testObject: ICreateTestObjectReturnType;

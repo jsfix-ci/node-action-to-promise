@@ -169,16 +169,31 @@ interface IA2PAction {
 }
 ```
 
+#### `<action2promisewrapper>.dispatchStartAction(store: Store, action: AnyAction) => Promise<void>`
+
+Function dispatches action to the store calling 'dispatch' method of the store. It returns promise that will be resolved or rejected
+depending on action (either resolve or reject) PUT'ed to the store.
+Note: this method throws and exception if `action` type is not registered
+
+#### `<action2promisewrapper>.compDispatchStartAction(dispatch: (action: AnyAction) => AnyAction, action: AnyAction) => Promise<void>`
+
+Function dispatches action to store calling 'dispatch' method bound to that store. It returns promise that will be resolved or rejected
+depending on action (either resolve or reject) PUT'ed to the store.
+Note: this method throws and exception if `action` type is not registered
+
 #### `dispatchStartAction(store: Store, action: AnyAction) => Promise<void>`
 
 Function dispatches action to the store calling 'dispatch' method of the store. It returns promise that will be resolved or rejected
 depending on action (either resolve or reject) PUT'ed to the store.
+Note: this function is deprecated, use `<action2promisewrapper>.dispatchStartAction(...)` instead
 
 #### `compDispatchStartAction(dispatch: (action: AnyAction) => AnyAction, action: AnyAction) => Promise<void>`
 
 Function dispatches action to store calling 'dispatch' method bound to that store. It returns promise that will be resolved or rejected
 depending on action (either resolve or reject) PUT'ed to the store.
+Note: this function is deprecated, use `<action2promisewrapper>.compDispatchStartAction(...)` instead
 
-#### `actionFromPromiseAction(action: IA2PAction) => AnyAction`
+#### `actionFromPromiseAction(action: AnyAction) => AnyAction`
 
 Function usually called in Saga generator function to restore original action without `resolve` and `reject` properties.
+If `resolve` or `reject` is missing then it returns passed as parameter action.
