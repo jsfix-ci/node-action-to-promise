@@ -139,6 +139,8 @@ export interface IActionTriple {
 interface IAction2PromiseWrapper {
     createSagaMiddleware: (options?: any) => any; 
     registerActions: (actions: IActionTriple) => void; 
+    dispatchStartAction: (store: Store, action: AnyAction) => Promise<void>;
+    compDispatchStartAction: (dispatch: (action: AnyAction) => AnyAction, action: AnyAction) => Promise<void>;
 }  
 ```
 
