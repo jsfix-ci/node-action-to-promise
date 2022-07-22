@@ -1,7 +1,7 @@
 import { createAction2PromiseWrapper, dispatchStartAction, actionFromPromiseAction, IAction2PromiseWrapper, ActionEntryType, ISagaTakeEffectWatcher, ISagaEffectIds, IActionEntries, EffectIdKind } from '../action-to-promise';
 import { createStore, applyMiddleware, compose, Action, AnyAction } from "redux";
 import { take, fork, actionChannel, call, put } from 'redux-saga/effects';
-import { END } from 'redux-saga';
+import { buffers, END } from 'redux-saga';
 
 //declare global {
 //    interface Window { __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any }
@@ -82,7 +82,7 @@ function* workerSagaGetDataWithFailure(org_action: AnyAction) {
 }
 
 function* watcherSagaChannelAndFork() {
-    const actChan = yield actionChannel("REQUEST");
+    const actChan = yield actionChannel("REQUEST", buffers.fixed());
 
     while (true) {
         const action = yield take(actChan);
@@ -108,7 +108,7 @@ function* watcherSagaForkWithFailure() {
 }
 
 function* watcherSagaChannelAndCall() {
-    const actChan = yield actionChannel("REQUEST");
+    const actChan = yield actionChannel("REQUEST", buffers.fixed());
 
     while (true) {
         const action = yield take(actChan);
